@@ -1,39 +1,54 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import emailjs from "@emailjs/browser";
+import { enviarEmail } from "./enviarEmail"; // Importação da função de envio de email
 
 function Login() {
     const navigate = useNavigate();
+    const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [codigo, setCodigo] = useState('');
 
     useEffect(() => {
-        // Gera o código de verificação
         const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
         setCodigo(generatedCode);
-
     }, []);
+
+    useEffect(() => {
+        const fetchNomeUsuario = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/api/user/nome?email=${email}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    setNome(data.nome);
+                } else {
+                    console.error(data.message);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar o nome do usuário:', error);
+            }
+        };
+
+        fetchNomeUsuario();
+    }, [email]);
 
     const handleLogin = async (event) => {
         event.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3001/api/login', {
+            const response = await fetch('http://localhost:3001/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    email: email,
-                    senha: senha,
-                }),
+                body: JSON.stringify({ email, senha }),
             });
 
             if (response.ok) {
                 alert('Login bem-sucedido!');
-                navigate('/mfa', { state: { codigo: codigo, email: email } });
-                enviarEmail();
+                enviarEmail(nome, codigo, email); // Chama a função de enviar email
+                navigate('/mfa', { state: { codigo, email } });
             } else {
                 alert('Email ou senha incorretos!');
             }
@@ -41,30 +56,6 @@ function Login() {
             console.error('Erro ao fazer login:', error);
         }
     };
-
-    function enviarEmail() {
-
-        const templateParams = {
-            texto: codigo,
-            email: email,
-        };
-
-        emailjs
-            .send(
-                "seu service id", //Service ID
-                "seu template id", //Template ID
-                templateParams,
-                "sua publick key" //Public key
-            )
-            .then(
-                (response) => {
-                    console.log("EMAIL ENVIADO", response.status, response.text);
-                },
-                (err) => {
-                    console.log("ERRO: ", err);
-                }
-            );
-    }
 
     return (
         <>
@@ -89,7 +80,7 @@ function Login() {
             <Link to={"/cadastro"}>Não tem cadastro? </Link>
             <Link to={"/"}>Início</Link>
         </>
-    )
+    );
 }
 
 export default Login;

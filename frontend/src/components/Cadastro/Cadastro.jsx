@@ -1,39 +1,24 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from '../../services/authService';
 
 function Cadastro() {
-    const [email, setEmail] = useState('')
-    const [senha, setSenha] = useState('')
-    const [nome, setNome] = useState('')
-    const navigate = useNavigate()
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const [nome, setNome] = useState('');
+    const navigate = useNavigate();
 
     const enviarDados = async (event) => {
         event.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3001/api/salvarDados', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    nome: nome,
-                    email: email,
-                    senha: senha,
-                }),
-            });
+            const data = await registerUser(nome, email, senha);
 
-            console.log('Response OK:', response.ok);
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Cadastro realizado!')
+            if (data.success) {
+                alert('Cadastro realizado!');
                 navigate('/login');
-            } else if (response.status === 400) {
-                alert('Erro: Email já cadastrado!');
             } else {
-                throw new Error(data.error || 'Erro!');
+                alert('Erro: ' + data.message);
             }
         } catch (error) {
             console.error('Erro ao enviar os dados:', error);
@@ -41,24 +26,24 @@ function Cadastro() {
     };
 
     return (
-        <>
+        <div>
             <h1>Cadastro</h1>
             <form onSubmit={enviarDados}>
-                <label>nome</label>
+                <label>Nome</label>
                 <input
-                    type="nome"
+                    type="text"
                     name="nome"
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                 />
-                <label>email</label>
+                <label>Email</label>
                 <input
                     type="email"
                     name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <label>senha</label>
+                <label>Senha</label>
                 <input
                     type="password"
                     name="password"
@@ -69,8 +54,8 @@ function Cadastro() {
             </form>
             <Link to={"/login"}>Já tem cadastro? </Link>
             <Link to={"/"}>Início</Link>
-        </>
-    )
+        </div>
+    );
 }
 
 export default Cadastro;
