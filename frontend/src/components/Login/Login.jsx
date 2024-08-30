@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { enviarEmail } from "./enviarEmail"; // Importação da função de envio de email
+import { enviarEmail } from "./enviarEmail";
 
 function Login() {
     const navigate = useNavigate();
@@ -15,23 +15,26 @@ function Login() {
     }, []);
 
     useEffect(() => {
-        const fetchNomeUsuario = async () => {
-            try {
-                const response = await fetch(`http://localhost:3001/api/user/nome?email=${email}`);
-                const data = await response.json();
-
-                if (response.ok) {
-                    setNome(data.nome);
-                } else {
-                    console.error(data.message);
+        if (email) {
+            const fetchNomeUsuario = async () => {
+                try {
+                    const response = await fetch(`http://localhost:3001/api/user/nome?email=${email}`);
+                    const data = await response.json();
+    
+                    if (response.ok) {
+                        setNome(data.nome);
+                    } else {
+                        console.error(data.message);
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar o nome do usuário:', error);
                 }
-            } catch (error) {
-                console.error('Erro ao buscar o nome do usuário:', error);
-            }
-        };
-
-        fetchNomeUsuario();
+            };
+    
+            fetchNomeUsuario();
+        }
     }, [email]);
+    
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -47,7 +50,7 @@ function Login() {
 
             if (response.ok) {
                 alert('Login bem-sucedido!');
-                enviarEmail(nome, codigo, email); // Chama a função de enviar email
+                enviarEmail(nome, codigo, email);
                 navigate('/mfa', { state: { codigo, email } });
             } else {
                 alert('Email ou senha incorretos!');

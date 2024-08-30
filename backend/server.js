@@ -1,4 +1,3 @@
-// src/server.js
 require('dotenv').config({ path: 'credentials.env' });
 const express = require('express');
 const cors = require('cors');
@@ -13,13 +12,10 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Conectar ao banco de dados e iniciar o servidor
 connectToDatabase().then(() => {
-    // Configurar as rotas
     app.use('/api/auth', authRoutes);
     app.use('/api/user', userRoutes);
 
-    // Middleware de erro
     app.use(errorMiddleware);
 
     app.listen(PORT, () => {

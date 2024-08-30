@@ -4,8 +4,7 @@ import Cadastro from './components/Cadastro/Cadastro';
 import Login from './components/Login/Login';
 import Inicio from './components/Inicio/Inicio';
 import MFA from './components/MFA/Mfa'; 
-import Home from './components/Home/Home';                                                                                                                                                                                                                                                                                                                                                                                                                                        
-
+import Home from './components/Home/Home';                                                                                                                                                                                                                        
 function App() {
     return (
         <BrowserRouter>

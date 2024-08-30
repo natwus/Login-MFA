@@ -6,16 +6,16 @@ async function register(req, res) {
     const connection = await connectToDatabase();
 
     try {
-        const [rows] = await connection.execute('SELECT email FROM usuarios WHERE email = ?', [email]);
+        const [rows] = await connection.execute('SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?', [email]);
 
         if (rows.length > 0) {
             return res.status(400).json({ message: 'Erro: Email já cadastrado!' });
         }
 
         const hashedPassword = await bcrypt.hash(senha, 10);
-        await connection.execute('INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)', [nome, email, hashedPassword]);
+        await connection.execute('INSERT INTO usuarios (nomeUsuario, emailUsuario, senhaUsuario) VALUES (?, ?, ?)', [nome, email, hashedPassword]);
 
-        res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
+        res.status(200).json({ sucess:true, message: 'Cadastro realizado com sucesso!' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Erro ao salvar os dados.' });
@@ -27,19 +27,19 @@ async function login(req, res) {
     const connection = await connectToDatabase();
 
     try {
-        const [rows] = await connection.execute('SELECT nome, email, senha FROM usuarios WHERE email = ?', [email]);
+        const [rows] = await connection.execute('SELECT nomeUsuario, emailUsuario, senhaUsuario FROM usuarios WHERE emailUsuario = ?', [email]);
 
         if (rows.length === 0) {
             return res.status(401).json({ message: 'Credenciais inválidas!' });
         }
 
         const usuario = rows[0];
-        const senhaValida = await bcrypt.compare(senha, usuario.senha);
+        const senhaValida = await bcrypt.compare(senha, usuario.senhaUsuario);
 
         if (senhaValida) {
             return res.status(200).json({
                 message: 'Login bem-sucedido!',
-                usuario: { nome: usuario.nome, email: usuario.email }
+                usuario: { nome: usuario.nomeUsuario, email: usuario.emailUsuario }
             });
         } else {
             return res.status(401).json({ message: 'Credenciais inválidas!' });

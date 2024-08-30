@@ -1,4 +1,3 @@
-// src/controllers/userController.js
 const { connectToDatabase } = require('../config/db');
 
 async function getUserName(req, res) {
@@ -6,10 +5,10 @@ async function getUserName(req, res) {
     const connection = await connectToDatabase();
 
     try {
-        const [rows] = await connection.execute('SELECT nome FROM usuarios WHERE email = ?', [email]);
+        const [rows] = await connection.execute('SELECT nomeUsuario FROM usuarios WHERE emailUsuario = ?', [email]);
 
         if (rows.length > 0) {
-            res.status(200).json({ nome: rows[0].nome });
+            res.status(200).json({ nome: rows[0].nomeUsuario });
         } else {
             res.status(404).json({ message: 'Usuário não encontrado!' });
         }

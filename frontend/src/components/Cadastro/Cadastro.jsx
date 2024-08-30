@@ -14,7 +14,7 @@ function Cadastro() {
         try {
             const data = await registerUser(nome, email, senha);
 
-            if (data.success) {
+            if (data.sucess) {
                 alert('Cadastro realizado!');
                 navigate('/login');
             } else {
